@@ -1,0 +1,15 @@
+# Phase 1
+arxiv==2.1.0
+pymupdf==1.24.5
+langchain-text-splitters==0.2.2
+pydantic==2.7.1
+pydantic-settings==2.3.4
+python-dotenv==1.0.1
+loguru==0.7.2
+httpx==0.27.0
+
+# Phase 2
+sentence-transformers==3.0.1
+qdrant-client==1.10.1
+psycopg2-binary==2.9.9
+sqlalchemy==2.0.31
