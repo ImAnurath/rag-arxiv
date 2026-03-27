@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>arXiv RAG — Research Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0f0e;
+    --surface: #161714;
+    --surface2: #1d1e1b;
+    --border: #2a2b27;
+    --border2: #353630;
+    --accent: #c8f060;
+    --accent-dim: #8fb040;
+    --text: #e8e9e3;
+    --text-muted: #7a7c72;
+    --text-dim: #4a4c44;
+    --red: #ff6b5b;
+    --mono: 'DM Mono', monospace;
+    --serif: 'Instrument Serif', serif;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  /* Header */
+  header {
+    grid-column: 1 / -1;
+    border-bottom: 1px solid var(--border);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: var(--surface);
+  }
+
+  .logo-mark {
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+
+  .logo-mark svg { width: 18px; height: 18px; }
+
+  .header-title {
+    font-family: var(--serif);
+    font-size: 20px;
+    color: var(--text);
+    font-style: italic;
+  }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-left: auto;
+    letter-spacing: 0.05em;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  /* Left panel */
+  .left-panel {
+    border-right: 1px solid var(--border);
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    background: var(--surface);
+    overflow-y: auto;
+  }
+
+  .panel-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .query-box {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 14px;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.6;
+    resize: vertical;
+    min-height: 120px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .query-box::placeholder { color: var(--text-dim); }
+  .query-box:focus { border-color: var(--accent-dim); }
+
+  .param-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .param-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .param-label span { color: var(--accent); }
+
+  input[type=range] {
+    width: 100%;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 13px;
+    background: var(--accent);
+    color: #0e0f0e;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  .submit-btn:hover { background: #d4f470; }
+  .submit-btn:active { transform: scale(0.98); }
+  .submit-btn:disabled { background: var(--border2); color: var(--text-dim); cursor: not-allowed; }
+
+  .url-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .url-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    color: var(--text-muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    outline: none;
+  }
+
+  .url-input:focus { border-color: var(--border2); color: var(--text); }
+
+  /* Suggested queries */
+  .suggestion-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .suggestion {
+    padding: 9px 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+    line-height: 1.4;
+  }
+
+  .suggestion:hover { border-color: var(--border2); color: var(--text); }
+
+  /* Right panel */
+  .right-panel {
+    padding: 32px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .empty-state {
+    margin: auto;
+    text-align: center;
+    color: var(--text-dim);
+  }
+
+  .empty-state .big-text {
+    font-family: var(--serif);
+    font-size: 48px;
+    font-style: italic;
+    color: var(--border2);
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+
+  .empty-state p {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+  }
+
+  /* Answer card */
+  .answer-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    animation: fadeUp 0.3s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .card-meta {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+
+  .card-body {
+    padding: 20px 18px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text);
+    white-space: pre-wrap;
+    font-family: var(--sans);
+  }
+
+  /* Mock answer styling */
+  .card-body.mock {
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+
+  /* Sources */
+  .sources-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .source-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    align-items: start;
+    text-decoration: none;
+    transition: border-color 0.15s;
+  }
+
+  .source-chip:hover { border-color: var(--border2); }
+
+  .source-id {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    background: rgba(200,240,96,0.08);
+    padding: 3px 7px;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  .source-title {
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.4;
+    margin-bottom: 4px;
+  }
+
+  .source-authors {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+
+  /* Usage bar */
+  .usage-row {
+    display: flex;
+    gap: 20px;
+    padding: 12px 18px;
+    border-top: 1px solid var(--border);
+  }
+
+  .usage-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .usage-val {
+    font-family: var(--mono);
+    font-size: 16px;
+    color: var(--text);
+  }
+
+  .usage-key {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+  }
+
+  /* Error */
+  .error-card {
+    background: rgba(255,107,91,0.06);
+    border: 1px solid rgba(255,107,91,0.2);
+    border-radius: 10px;
+    padding: 16px 18px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--red);
+    animation: fadeUp 0.2s ease;
+  }
+
+  /* Loading */
+  .loading-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 32px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    animation: fadeUp 0.2s ease;
+  }
+
+  .spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-text {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* Query echo */
+  .query-echo {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-style: italic;
+    color: var(--text);
+    line-height: 1.3;
+    border-left: 2px solid var(--accent);
+    padding-left: 16px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">
+    <svg viewBox="0 0 18 18" fill="none">
+      <rect x="2" y="2" width="6" height="6" rx="1" fill="#0e0f0e"/>
+      <rect x="10" y="2" width="6" height="6" rx="1" fill="#0e0f0e"/>
+      <rect x="2" y="10" width="6" height="6" rx="1" fill="#0e0f0e"/>
+      <circle cx="13" cy="13" r="3" fill="#0e0f0e"/>
+    </svg>
+  </div>
+  <span class="header-title">arXiv Research Assistant</span>
+  <span class="header-sub"><span class="status-dot"></span>RAG · Hybrid Retrieval · Phase 3</span>
+</header>
+
+<div class="left-panel">
+  <div>
+    <div class="panel-label">API endpoint</div>
+    <div class="url-row">
+      <input class="url-input" id="api-url" type="text" value="http://localhost:8000">
+    </div>
+  </div>
+
+  <div>
+    <div class="panel-label">Query</div>
+    <textarea class="query-box" id="query-input" placeholder="Ask anything about the ingested arXiv papers..."></textarea>
+  </div>
+
+  <div>
+    <div class="param-row">
+      <div class="param-label">Top-K chunks passed to LLM <span id="topk-val">5</span></div>
+      <input type="range" id="topk" min="1" max="10" value="5"
+        oninput="document.getElementById('topk-val').textContent = this.value">
+    </div>
+  </div>
+
+  <button class="submit-btn" id="submit-btn" onclick="runQuery()">→ Run query</button>
+
+  <div>
+    <div class="panel-label">Suggested queries</div>
+    <div class="suggestion-list">
+      <div class="suggestion" onclick="setQuery(this)">What are recent approaches to efficient transformer training?</div>
+      <div class="suggestion" onclick="setQuery(this)">How is reinforcement learning used in LLM alignment?</div>
+      <div class="suggestion" onclick="setQuery(this)">What methods exist for reducing hallucination in language models?</div>
+      <div class="suggestion" onclick="setQuery(this)">Explain recent advances in multimodal models</div>
+      <div class="suggestion" onclick="setQuery(this)">What are the latest benchmarks for evaluating reasoning in LLMs?</div>
+    </div>
+  </div>
+</div>
+
+<div class="right-panel" id="right-panel">
+  <div class="empty-state">
+    <div class="big-text">Ask anything.</div>
+    <p>HYBRID RETRIEVAL + RERANKING + LLM SYNTHESIS</p>
+  </div>
+</div>
+
+<script>
+  function setQuery(el) {
+    document.getElementById('query-input').value = el.textContent.trim();
+  }
+
+  async function runQuery() {
+    const query = document.getElementById('query-input').value.trim();
+    const topK  = parseInt(document.getElementById('topk').value);
+    const base  = document.getElementById('api-url').value.trim().replace(/\/$/, '');
+    const btn   = document.getElementById('submit-btn');
+    const panel = document.getElementById('right-panel');
+
+    if (!query) return;
+
+    btn.disabled = true;
+    btn.textContent = '⏳ Retrieving...';
+
+    panel.innerHTML = `
+      <div class="query-echo">"${query}"</div>
+      <div class="loading-card">
+        <div class="spinner"></div>
+        <span class="loading-text">Hybrid retrieval → reranking → generation...</span>
+      </div>`;
+
+    try {
+      const res = await fetch(`${base}/query`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, top_k: topK })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ detail: res.statusText }));
+        throw new Error(err.detail || `HTTP ${res.status}`);
+      }
+
+      const data = await res.json();
+      renderResult(query, data, panel);
+
+    } catch (e) {
+      panel.innerHTML = `
+        <div class="query-echo">"${query}"</div>
+        <div class="error-card">✗ ${e.message}</div>`;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '→ Run query';
+    }
+  }
+
+  function renderResult(query, data, panel) {
+    const isMock = data.answer.startsWith('[MOCK');
+    const sourcesHtml = (data.sources || []).map(s => `
+      <a class="source-chip" href="https://arxiv.org/abs/${s.arxiv_id}" target="_blank">
+        <span class="source-id">${s.arxiv_id}</span>
+        <div>
+          <div class="source-title">${s.title || 'Untitled'}</div>
+          <div class="source-authors">${(s.authors || []).slice(0,3).join(', ')}${s.authors?.length > 3 ? ' et al.' : ''}</div>
+        </div>
+      </a>`).join('');
+
+    const usageHtml = !isMock ? `
+      <div class="usage-row">
+        <div class="usage-stat"><span class="usage-val">${data.usage?.input_tokens ?? '—'}</span><span class="usage-key">INPUT TOKENS</span></div>
+        <div class="usage-stat"><span class="usage-val">${data.usage?.output_tokens ?? '—'}</span><span class="usage-key">OUTPUT TOKENS</span></div>
+        <div class="usage-stat"><span class="usage-val">${data.retrieved_chunks}</span><span class="usage-key">CHUNKS USED</span></div>
+      </div>` : '';
+
+    panel.innerHTML = `
+      <div class="query-echo">"${query}"</div>
+
+      <div class="answer-card">
+        <div class="card-header">
+          <span class="card-label">${isMock ? 'Mock response — retrieval preview' : 'Answer'}</span>
+          <span class="card-meta">${data.retrieved_chunks} chunks · ${data.sources?.length ?? 0} sources</span>
+        </div>
+        <div class="card-body ${isMock ? 'mock' : ''}">${data.answer}</div>
+        ${usageHtml}
+      </div>
+
+      ${data.sources?.length ? `
+      <div>
+        <div class="panel-label" style="margin-bottom:10px">Sources</div>
+        <div class="sources-grid">${sourcesHtml}</div>
+      </div>` : ''}`;
+  }
+
+  // Submit on Ctrl+Enter
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') runQuery();
+  });
+</script>
+</body>
+</html>
