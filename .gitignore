@@ -1,3 +1,4 @@
 CLAUDE.md
 docker-compose.yml
 data
+__pycache__
