@@ -1,22 +1,24 @@
 from pydantic_settings import BaseSettings
 from pathlib import Path
-
+'''
+Centralized configurations
+'''
 
 class Settings(BaseSettings):
     # arXiv fetch settings
-    ARXIV_MAX_RESULTS: int = 10 # how many papers to fetch
-    ARXIV_SEARCH_QUERY: str = "cat:cs.AI OR cat:cs.LG OR cat:cs.CL" # arXiv search query (see https://arxiv.org/help/api/user-manual#search_query for syntax)
-    ARXIV_DOWNLOAD_DIR: Path = Path("data/pdfs") # where to save downloaded PDFs
+    ARXIV_MAX_RESULTS: int = 25 # how many papers to fetch
+    ARXIV_SEARCH_QUERY: str = "cat:cs.AI OR cat:cs.LG OR cat:cs.CL" # arXiv search query (https://arxiv.org/help/api/user-manual#search_query for syntax)
+    ARXIV_DOWNLOAD_DIR: Path = Path("data/pdfs") # where to save downloaded PDFs TODO: still need to update it for current dir structure just in case
 
     # Chunking
     CHUNK_SIZE: int = 512 # target chunk size in characters (not exact, just a guideline for the chunker)
     CHUNK_OVERLAP: int = 64 # how many characters to overlap between chunks (for better context in retrieval)
 
     # Embedding
-    # Swap to "text-embedding-3-small" if you want OpenAI instead
-    EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2" # Hugging Face model name for embedding (see https://huggingface.co/models?filter=sentence-transformers for options)
+    # (https://huggingface.co/models?filter=sentence-transformers for options)
+    EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2" # Hugging Face model name for embedding TODO: should get a better model down the line later on
     EMBEDDING_BATCH_SIZE: int = 64   # chunks per embedding batch
-    EMBEDDING_DIMENSION: int = 384   # MiniLM output size (1536 for OpenAI)
+    EMBEDDING_DIMENSION: int = 384   # MiniLM output size
 
     # Qdrant
     QDRANT_HOST: str = "localhost" # Qdrant host URL
@@ -26,6 +28,17 @@ class Settings(BaseSettings):
     # PostgreSQL
     POSTGRES_URL: str = "postgresql://raguser:ragpass@localhost:5432/ragdb" # SQLAlchemy-style connection URL for PostgreSQL
 
+    # Retrieval
+    RETRIEVAL_TOP_K: int = 20       # candidates fetched from each retriever
+    RERANK_TOP_K: int = 5           # final chunks passed to LLM after reranking
+    RRF_K: int = 60                 # RRF constant — 60 is standard default
+    
+    # LLM - Placeholders for now until I finish implementing the generator
+    # but I will override these in the future with .env values
+    LLM_API_KEY: str = ""
+    LLM_MODEL: str = "llm model something something" # Placeholder for now
+    LLM_MAX_TOKENS: int = 1024
+    
     class Config:
         env_file = ".env"
 
