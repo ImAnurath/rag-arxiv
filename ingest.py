@@ -30,6 +30,9 @@ def run_ingestion():
     embedder = Embedder()
     embedded = embedder.embed_chunks(fresh_chunks)
 
+    if embedder.dimension is None:
+        raise ValueError("Embedder dimension is not initialized")
+    
     qdrant = QdrantStore(dimension=embedder.dimension)
     qdrant.upsert(embedded)
 

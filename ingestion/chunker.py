@@ -1,7 +1,7 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pydantic import BaseModel
 from loguru import logger
-
+import hashlib
 from .base import Document
 from config import settings
 
@@ -50,7 +50,6 @@ class RecursiveChunker:
         texts = self.splitter.split_text(doc.content)
         chunks = []
         for i, text in enumerate(texts):
-            import hashlib
             chunk_id = hashlib.sha256(f"{doc.doc_id}::{i}".encode()).hexdigest()[:16]
             chunks.append(Chunk(
                 chunk_id=chunk_id,

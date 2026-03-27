@@ -9,7 +9,6 @@ from .chunker import Chunk
 class Deduplicator:
     """
     Maintains a local set of seen chunk hashes.
-    In Phase 2 this will be replaced with a DB lookup.
     """
 
     def __init__(self, state_file: Path = Path("data/seen_hashes.json")):

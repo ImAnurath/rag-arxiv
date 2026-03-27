@@ -21,7 +21,7 @@ class ArxivLoader(BaseLoader):
         self.download_dir = download_dir or settings.ARXIV_DOWNLOAD_DIR
         self.download_dir.mkdir(parents=True, exist_ok=True)
 
-    def load(self) -> list[Document]:
+    def load(self) -> list[Document]: # 
         logger.info(f"Fetching up to {self.max_results} papers for: {self.query}")
         client = arxiv.Client()
         search = arxiv.Search(
