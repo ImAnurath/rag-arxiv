@@ -97,3 +97,22 @@ class PostgresStore:
         if value is None:
             return None
         return value.replace('\x00', '')
+    
+    def get_all_chunks(self) -> list[dict]:
+        """Returns all chunks as plain dicts for BM25 indexing."""
+        with Session(self.engine) as session:
+            records = session.query(ChunkRecord).all()
+            return [
+                {
+                    "chunk_id": r.chunk_id,
+                    "doc_id": r.doc_id,
+                    "source": r.source,
+                    "source_type": r.source_type,
+                    "title": r.title,
+                    "authors": r.authors,
+                    "chunk_index": r.chunk_index,
+                    "content": r.content_preview or "",
+                    "extra_metadata": r.extra_metadata or {},
+                }
+                for r in records
+            ]
