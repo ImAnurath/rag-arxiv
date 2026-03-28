@@ -3,8 +3,80 @@
     "question": "What is retrieval-augmented generation (RAG) and why is it useful?",
     "ground_truth": "RAG is a technique that combines a retrieval system with a language model. Instead of relying solely on parametric knowledge, the model retrieves relevant documents at inference time and conditions its answer on them. This reduces hallucination and allows the model to access up-to-date or domain-specific knowledge without retraining."
   },
-    {
+  {
     "question": "What are the main challenges in training large language models efficiently?",
     "ground_truth": "Key challenges include high memory consumption, long training times, and the cost of processing long sequences. Techniques such as gradient checkpointing, mixed-precision training, parameter-efficient fine-tuning (PEFT), and distributed training strategies are commonly used to address these issues."
+  },
+  {
+    "question": "How does instruction tuning improve language model behaviour?",
+    "ground_truth": "Instruction tuning fine-tunes a pretrained language model on a dataset of instruction-response pairs, teaching it to follow natural language instructions. This improves zero-shot generalisation across tasks and makes the model more aligned with user intent without task-specific prompting."
+  },
+  {
+    "question": "What is the role of attention mechanisms in transformer models?",
+    "ground_truth": "Attention mechanisms allow the model to weigh the relevance of different tokens in the input when producing each output token. Self-attention lets every position in a sequence attend to every other position, enabling the model to capture long-range dependencies that recurrent architectures struggle with."
+  },
+  {
+    "question": "What are common methods for reducing hallucination in language models?",
+    "ground_truth": "Common approaches include grounding the model with retrieved documents (RAG), applying reinforcement learning from human feedback (RLHF), using chain-of-thought prompting to encourage step-by-step reasoning, and post-hoc verification against external knowledge sources."
+  },
+  {
+    "question": "How is reinforcement learning from human feedback (RLHF) used to align LLMs?",
+    "ground_truth": "RLHF fine-tunes a language model using a reward model trained on human preference data. The language model is updated via proximal policy optimisation (PPO) to maximise reward, encouraging outputs that humans rate as more helpful, harmless, and honest."
+  },
+  {
+    "question": "What is the difference between fine-tuning and prompt engineering for adapting LLMs?",
+    "ground_truth": "Fine-tuning updates the model weights using task-specific data, which can significantly improve performance but requires compute and labelled examples. Prompt engineering adapts model behaviour at inference time by crafting effective input prompts, requiring no weight updates but may be less reliable on complex tasks."
+  },
+  {
+    "question": "What are mixture of experts (MoE) models and what advantage do they offer?",
+    "ground_truth": "MoE models contain multiple specialised subnetworks called experts. A gating mechanism routes each input to a subset of experts, so not all parameters are active for every token. This allows the total parameter count to be very large while keeping per-token compute constant, improving efficiency at scale."
+  },
+  {
+    "question": "How do vector databases support semantic search?",
+    "ground_truth": "Vector databases store high-dimensional embedding vectors alongside metadata. At query time, the query is embedded into the same space and approximate nearest neighbour search retrieves the most similar vectors. This enables semantic matching beyond keyword overlap, making them essential infrastructure for RAG systems."
+  },
+  {
+    "question": "What is chain-of-thought prompting and when is it effective?",
+    "ground_truth": "Chain-of-thought prompting encourages the model to produce intermediate reasoning steps before the final answer. It is most effective on tasks requiring multi-step reasoning such as arithmetic, commonsense reasoning, and logical inference, and works best with large models."
+  },
+  {
+    "question": "What evaluation metrics are commonly used for assessing RAG systems?",
+    "ground_truth": "Common metrics include faithfulness (is the answer supported by the retrieved context), answer relevancy (does the answer address the question), context recall (were the relevant documents retrieved), and context precision (are the retrieved documents actually useful). Frameworks such as RAGAS automate measurement of these metrics."
+  },
+  {
+    "question": "What is parameter-efficient fine-tuning (PEFT) and what methods does it include?",
+    "ground_truth": "PEFT adapts pretrained models to new tasks by updating only a small subset of parameters. Popular methods include LoRA, which injects low-rank decomposition matrices into attention layers, and prefix tuning, which prepends learnable tokens to the input. PEFT significantly reduces memory and compute requirements compared to full fine-tuning."
+  },
+  {
+    "question": "How do multimodal language models handle multiple input types?",
+    "ground_truth": "Multimodal models encode different input modalities (text, images, audio) into a shared embedding space using modality-specific encoders. The representations are then processed jointly by a language model backbone, enabling cross-modal reasoning and generation tasks such as visual question answering and image captioning."
+  },
+  {
+    "question": "What is the significance of scaling laws in deep learning?",
+    "ground_truth": "Scaling laws describe predictable power-law relationships between model performance and factors such as model size, dataset size, and compute budget. They allow researchers to forecast how much improvement a given investment in scale will yield, informing decisions about training runs before they are executed."
+  },
+  {
+    "question": "How does knowledge distillation work in the context of language models?",
+    "ground_truth": "Knowledge distillation trains a smaller student model to mimic the output distribution of a larger teacher model rather than training on hard labels alone. The soft probability distributions from the teacher carry richer information about inter-class relationships, helping the student generalise better than training from scratch."
+  },
+  {
+    "question": "What are the main approaches to long-context modelling in transformers?",
+    "ground_truth": "Approaches include sliding window attention which restricts each token to attending to a local window, sparse attention patterns that select a subset of tokens to attend to, positional encoding modifications such as RoPE scaling to extend context length, and memory-augmented architectures that compress older context into a persistent memory store."
+  },
+  {
+    "question": "What is in-context learning and how does it differ from fine-tuning?",
+    "ground_truth": "In-context learning uses a few demonstration examples placed directly in the prompt to guide the model's behaviour at inference time without changing any weights. Fine-tuning permanently updates the model weights using gradient descent on a labelled dataset, which is more compute-intensive but yields stronger task-specific performance."
+  },
+  {
+    "question": "How are embedding models trained for dense retrieval?",
+    "ground_truth": "Dense retrieval models are typically trained with contrastive learning objectives such as in-batch negatives or hard negative mining. Positive pairs are (query, relevant document) and negative pairs are (query, irrelevant document). The model learns to push positive pair embeddings close together and negative pairs far apart in the embedding space."
+  },
+  {
+    "question": "What is the purpose of a reranker in a retrieval pipeline?",
+    "ground_truth": "A reranker is a cross-encoder model that scores (query, document) pairs jointly rather than independently. It is applied to a small set of candidates retrieved by a faster first-stage retriever, and produces more accurate relevance scores at the cost of higher latency, improving the final ranking quality."
+  },
+  {
+    "question": "What techniques exist for detecting and mitigating bias in language models?",
+    "ground_truth": "Detection techniques include probing classifiers, counterfactual data augmentation tests, and bias benchmarks such as WinoBias. Mitigation approaches include debiasing during pretraining through dataset curation, fine-tuning on balanced data, RLHF with fairness-aware reward models, and post-hoc output filtering."
   }
 ]
