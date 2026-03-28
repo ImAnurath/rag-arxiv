@@ -35,9 +35,20 @@ class Settings(BaseSettings):
     
     # LLM - Placeholders for now until I finish implementing the generator
     # but I will override these in the future with .env values
-    LLM_API_KEY: str = ""
-    LLM_MODEL: str = "llm model something something" # Placeholder for now
+    
+    # LLM provider selection
+    # Options: "anthropic", "ollama", "openai"
+    LLM_PROVIDER: str = "ollama"
+    # Shared
+    LLM_API_KEY: str = ""        # not needed for ollama
+    LLM_MODEL: str = "llama3.2"  # override per provider in .env
     LLM_MAX_TOKENS: int = 1024
+    
+    # Ollama specific
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    
+    # OpenAI-compatible specific (also works for Gemini via their OpenAI endpoint)
+    OPENAI_BASE_URL: str = "https://api.openai.com/v1"
     
     class Config:
         env_file = ".env"
