@@ -1,0 +1,6 @@
+[
+  {
+    "question": "What is retrieval-augmented generation (RAG) and why is it useful?",
+    "ground_truth": "RAG is a technique that combines a retrieval system with a language model. Instead of relying solely on parametric knowledge, the model retrieves relevant documents at inference time and conditions its answer on them. This reduces hallucination and allows the model to access up-to-date or domain-specific knowledge without retraining."
+  }
+]
