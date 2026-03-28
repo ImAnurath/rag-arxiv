@@ -33,12 +33,10 @@ class Settings(BaseSettings):
     RERANK_TOP_K: int = 5           # final chunks passed to LLM after reranking
     RRF_K: int = 60                 # RRF constant — 60 is standard default
     
-    # LLM - Placeholders for now until I finish implementing the generator
-    # but I will override these in the future with .env values
-    
     # LLM provider selection
     # Options: "anthropic", "ollama", "openai"
     LLM_PROVIDER: str = "ollama"
+    
     # Shared
     LLM_API_KEY: str = ""        # not needed for ollama
     LLM_MODEL: str = "llama3.2"  # override per provider in .env
@@ -46,7 +44,6 @@ class Settings(BaseSettings):
     
     # Ollama specific
     OLLAMA_BASE_URL: str = "http://localhost:11434"
-    
     # OpenAI-compatible specific (also works for Gemini via their OpenAI endpoint)
     OPENAI_BASE_URL: str = "https://api.openai.com/v1"
     
