@@ -14,6 +14,7 @@ from config import settings
 DATASET_PATH = Path("evaluation/golden_dataset.json")
 API_URL = "http://localhost:8000"
 
+
 class Evaluator:
     def __init__(self, top_k: int = 5):
         self.top_k = top_k
@@ -21,8 +22,8 @@ class Evaluator:
 
         # RAGAS uses an LLM for faithfulness + answer relevancy
         # and an embedding model for context metrics
-        self.llm = ChatAnthropic(
-            model="claude-haiku-4-5-20251001",
+        self.llm = ChatAnthropic( # TODO: need to change this whole thing at some point to support multiple LLMs
+            model="claude-haiku-4-5-20251001",   # cheapest model — eval only
             api_key=settings.LLM_API_KEY,
         )
         self.embeddings = HuggingFaceEmbeddings(
