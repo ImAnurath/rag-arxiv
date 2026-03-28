@@ -19,5 +19,6 @@ class QueryResponse(BaseModel):
     '''
     answer: str
     sources: list[SourceInfo] # provenance info for each source paper
+    contexts: list[str]        # raw chunk texts — needed for RAGAS
     retrieved_chunks: int # number of chunks retrieved from the database
     usage: dict # usage info from the LLM, e.g. token counts
