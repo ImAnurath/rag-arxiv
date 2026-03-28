@@ -62,6 +62,7 @@ def query(request: QueryRequest):
     return QueryResponse(
         answer=result["answer"],
         sources=result["sources"],
+        contexts=[c["content"] for c in reranked],
         retrieved_chunks=len(reranked),
         usage=result["usage"],
     )
