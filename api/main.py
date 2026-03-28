@@ -66,3 +66,14 @@ def query(request: QueryRequest):
         retrieved_chunks=len(reranked),
         usage=result["usage"],
     )
+
+@app.get("/health")
+def health():
+    provider_ok = retriever is not None
+    return {
+        "status": "ok",
+        "collection": settings.QDRANT_COLLECTION,
+        "llm_provider": settings.LLM_PROVIDER,
+        "llm_model": settings.LLM_MODEL,
+        "provider_healthy": retriever is not None,
+    }
