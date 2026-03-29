@@ -33,12 +33,9 @@ app = FastAPI(
     version="0.3.0",
     lifespan=lifespan,
 )
-
-
 @app.get("/health")
 def health():
     return {"status": "ok", "collection": settings.QDRANT_COLLECTION}
-
 
 @app.post("/query", response_model=QueryResponse)
 def query(request: QueryRequest):
