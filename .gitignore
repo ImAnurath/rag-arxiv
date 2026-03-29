@@ -1,6 +1,11 @@
 CLAUDE.md
 docker-compose.yml
-data
-**/__pycache__/
+data/
+
+# Python
+__pycache__/
 *.pyc
+
+# Environment
+.env
 *.env
